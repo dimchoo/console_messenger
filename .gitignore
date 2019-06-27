@@ -1,3 +1,5 @@
 /.idea/
 /venv/
 /__pycache__/
+/jim/__pycache__/
+*.DS_Store
