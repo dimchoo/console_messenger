@@ -1,0 +1,104 @@
+"""
+Базовые настройки проекта и общие констаты,
+основанные на протоколе JIM.
+"""
+
+# 1. Константа общей кодировки проекта:
+
+COMMON_ENCODING = 'utf-8'
+
+# 2. Константы серверных настроек:
+
+DEFAULT_SERVER_ADDRESS = '127.0.0.1'
+DEFAULT_SERVER_PORT = 8888
+DEFAULT_BIND_IP = ''
+
+
+# 3. Константы ключей для словарей/JSON-оъектов:
+
+# - Имя пользоватеоя/Название чата (str). Максимум 25 символов:
+ACCOUNT_NAME = 'account_name'
+# - Тип сообщения (str). Максимум 15 символов:
+ACTION = 'action'
+# - Необязательное сообщение/уведомление:
+# ALERT = 'alert'
+# - Дата запроса:
+# DATE = 'date'
+# - Кодировка:
+# ENCODING = 'encoding'
+# - Текст ошибки (str):
+ERROR = 'error'
+# - От кого собщение:
+# FROM = 'from'
+# - Текст сообщения:
+# MESSAGE = 'message'
+# - Пароль пользователя:
+# PASSWORD = 'password'
+# - Код ответа (int). 3 цифры:
+RESPONSE = 'response'
+# - Статус:
+# STATUS = 'status'
+# - Время запроса:
+TIME = 'time'
+# - Кому отправить сообщение:
+# TO = 'to'
+# - Тип:
+# TYPE = 'type'
+# - Данные пользователя (dict):
+USER = 'user'
+
+# 4. Константы значений:
+
+# - Значения для ACTION:
+AUTHENTICATE = 'authenticate'  # Клиентский запрос на авторизацию
+JOIN = 'join'                  # Присоединиться к чату
+LEAVE = 'leave'                # Покинуть чат
+MSG = 'msg'                    # Простое сообщение пользователю или в чат
+PRESENCE = 'presence'          # Клиентское сервисное сообщение о присутствие сервера
+PROBE = 'probe'                # Серверный запрос, проверяющий доступность пользователя (online ли пользователь)
+QUIT = 'quit'                  # Сообщение, сопровождающее отключение от сервера
+
+# 5. Константы кодов ответов:
+
+# 1xx — информационные сообщения:
+BASIC_NOTICE = 100
+IMPORTANT_NOTICE = 101
+# 2xx — успешное завершение:
+OK = 200
+CREATED = 201
+ACCEPTED = 202
+# 4xx — ошибка на стороне клиента:
+WRONG_REQUEST = 400
+NOT_AUTH = 401
+WRONG_AUTH = 402
+FORBIDDEN = 403
+NOT_FOUND = 404
+CONFLICT = 409
+OFFLINE = 410
+# 5xx — ошибка на стороне сервера:
+SERVER_ERROR = 500
+
+# 6. Константа кортежа со всеми кодами ответов:
+
+RESPONSE_CODES = (
+    BASIC_NOTICE,
+    IMPORTANT_NOTICE,
+    OK,
+    CREATED,
+    ACCEPTED,
+    WRONG_REQUEST,
+    NOT_AUTH,
+    WRONG_AUTH,
+    FORBIDDEN,
+    NOT_FOUND,
+    CONFLICT,
+    OFFLINE,
+    SERVER_ERROR
+)
+
+
+# 7. Константы соответствия:
+
+MAX_USERNAME_LEN = 25  # Максимальная длина имени пользователя
+MAX_ACTION_LEN = 15    # Максимальная длина типа сообщения
+RESPONSE_CODE_LEN = 3       # Единственная длина кода ответа
