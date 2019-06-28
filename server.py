@@ -36,10 +36,13 @@ if __name__ == '__main__':
 
     server.bind((addr, port))
     server.listen(5)
-    while True:
-        client, addr = server.accept()
-        presence = get_message(client)
-        print(presence)
-        response = presence_message_response(presence)
-        send_message(client, response)
-        client.close()
+    try:
+        while True:
+            client, addr = server.accept()
+            presence = get_message(client)
+            print(presence)
+            response = presence_message_response(presence)
+            send_message(client, response)
+            client.close()
+    except KeyboardInterrupt:
+        print('Сервер остановлен.')
