@@ -1,5 +1,5 @@
 import json
-from .config import COMMON_ENCODING
+from jim.config import COMMON_ENCODING
 
 
 def write_bytes(dict_message):
