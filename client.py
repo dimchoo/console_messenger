@@ -14,7 +14,7 @@ def get_time():
     return datetime.now().strftime("%H:%M:%S")
 
 
-def create_presence_message(account_name='Anonymous'):
+def create_presence_message(account_name=DEFAULT_ACCOUNT_NAME):
     """
     Функция формирует сообщение присутствия
     :param account_name: str (Имя пользователя)
@@ -66,3 +66,4 @@ if __name__ == '__main__':
     server_response = check_server_message(server_response)
     print(server_response)
     client.close()
+
