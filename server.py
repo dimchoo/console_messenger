@@ -3,6 +3,10 @@ import re
 from socket import socket, AF_INET, SOCK_STREAM
 from jim.config import *
 from jim.utils import send_message, get_message
+import logging
+import log.log_configs.server_log_config
+
+server_logger = logging.getLogger('server_logger')
 
 
 def presence_message_response(presence_message):
@@ -16,14 +20,26 @@ def presence_message_response(presence_message):
             and presence_message[ACTION] == PRESENCE \
             and TIME in presence_message \
             and re.match(time_template, presence_message[TIME]) is not None:
-        return {RESPONSE: OK}
-    return {RESPONSE: WRONG_REQUEST, ERROR: 'Неверный запрос!'}
+        response_ok = {RESPONSE: OK}
+        log_message = \
+            f'\tФункция:\n\t{presence_message_response.__name__}\n' \
+            f'\tАргумент:\n\t{presence_message}\n' \
+            f'\tОтвет:\n\t{response_ok}'
+        server_logger.info(log_message)
+        return response_ok
+    response_error = {RESPONSE: WRONG_REQUEST, ERROR: 'Неверный запрос!'}
+    log_message = \
+        f'\tФункция:\n\t{presence_message_response.__name__}\n' \
+        f'\tАргумент:\n\t{presence_message}\n' \
+        f'\tОтвет:\n\t{response_error}'
+    server_logger.error(log_message)
+    return response_error
 
 
 if __name__ == '__main__':
     server = socket(AF_INET, SOCK_STREAM)
     try:
-        addr = sys.argv[1]
+        addr = str(sys.argv[1])
     except IndexError:
         addr = DEFAULT_BIND_IP
     try:
@@ -31,7 +47,10 @@ if __name__ == '__main__':
     except IndexError:
         port = DEFAULT_SERVER_PORT
     except ValueError:
-        print('Порт должен быть целым числом')
+        server_logger.error(f'\tФункция:\n'
+                            f'sys.argv\n'
+                            f'\tОшибка:\n'
+                            f'Переданы некорректные аргументы - {sys.argv[1]}, {sys.argv[2]}')
         sys.exit(0)
 
     server.bind((addr, port))
@@ -45,4 +64,5 @@ if __name__ == '__main__':
             send_message(client, response)
             client.close()
     except KeyboardInterrupt:
-        print('Сервер остановлен.')
+        server_logger.info('\tСервер остановлен')
+        print('Сервер остановлен!')
