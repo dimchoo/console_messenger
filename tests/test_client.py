@@ -1,3 +1,6 @@
+# import sys
+# import os
+# sys.path.append(os.path.join(os.getcwd(), '..'))
 import unittest
 from client import create_presence_message, check_server_message, get_time
 from jim.config import *
