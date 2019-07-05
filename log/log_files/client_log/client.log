@@ -1,0 +1,16 @@
+2019-07-05 12:28:56,130 - INFO:
+	Функция:
+	create_presence_message
+	Аргумент:
+	Вася
+	Ответ:
+	{'action': 'presence', 'time': '12:28:56', 'user': {'account_name': 'Вася'}}
+
+2019-07-05 12:28:56,131 - INFO:
+	Функция:
+	check_server_message
+	Аргумент:
+	{'response': 200}
+	Ответ:
+	{'response': 200}
+
