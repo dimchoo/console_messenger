@@ -3,3 +3,4 @@
 /__pycache__/
 /jim/__pycache__/
 *.DS_Store
+/log/log_configs/__pycache__/
