@@ -5,3 +5,4 @@
 *.DS_Store
 /log/log_configs/__pycache__/
 *.cpython-37.pyc
+*.log
