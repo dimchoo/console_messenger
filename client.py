@@ -6,8 +6,10 @@ from jim.config import *
 from jim.utils import send_message, get_message
 import logging
 import log.log_configs.client_log_config
+from log.decorators import Log
 
 client_logger = logging.getLogger('client_logger')
+log_it = Log(client_logger)
 
 
 def get_time():
@@ -18,6 +20,7 @@ def get_time():
     return datetime.now().strftime("%H:%M:%S")
 
 
+@log_it
 def create_presence_message(account_name=DEFAULT_ACCOUNT_NAME):
     """
     Функция формирует сообщение присутствия
@@ -25,18 +28,8 @@ def create_presence_message(account_name=DEFAULT_ACCOUNT_NAME):
     :return: dict (Сообщение присутствия)
     """
     if not isinstance(account_name, str):
-        log_message = \
-            f'\tФункция:\n\t{create_presence_message.__name__}\n' \
-            f'\tАргумент:\n\t{account_name}\n' \
-            f'\tОшибка:\n\t{TypeError}'
-        client_logger.error(log_message)
         raise TypeError
     if len(account_name) > MAX_USERNAME_LEN:
-        log_message = \
-            f'\tФункция:\n\t{create_presence_message.__name__}\n' \
-            f'\tАргумент:\n\t{account_name}\n' \
-            f'\tОшибка:\n\t{UsernameTooLongError}'
-        client_logger.error(log_message)
         raise UsernameTooLongError(account_name)
     presence_message = {
         ACTION: PRESENCE,
@@ -45,51 +38,20 @@ def create_presence_message(account_name=DEFAULT_ACCOUNT_NAME):
             ACCOUNT_NAME: account_name
         }
     }
-    log_message = \
-        f'\tФункция:\n\t{create_presence_message.__name__}\n' \
-        f'\tАргумент:\n\t{account_name}\n' \
-        f'\tОтвет:\n\t{presence_message}'
-    client_logger.info(log_message)
     return presence_message
 
 
+@log_it
 def check_server_message(response_message):
     if not isinstance(response_message, dict):
-        log_message = \
-            f'\tФункция:\n\t{check_server_message.__name__}\n' \
-            f'\tАргумент:\n\t{response_message}\n' \
-            f'\tОшибка:\n\t{TypeError}'
-        client_logger.error(log_message)
         raise TypeError
     if RESPONSE not in response_message:
-        log_message = \
-            f'\tФункция:\n\t{check_server_message.__name__}\n' \
-            f'\tАргумент:\n\t{response_message}\n' \
-            f'\tОшибка:\n\t{MissingKeyError}'
-        client_logger.error(log_message)
         raise MissingKeyError(RESPONSE)
     response_code = response_message[RESPONSE]
     if len(str(response_code)) != RESPONSE_CODE_LEN:
-        log_message = \
-            f'\tФункция:\n\t{check_server_message.__name__}\n' \
-            f'\tАргумент:\n\t{response_message}\n' \
-            f'\tКод ответа:\n\t{response_code}\n' \
-            f'\tОшибка:\n\t{ResponseCodeLenError}'
-        client_logger.error(log_message)
         raise ResponseCodeLenError(response_code)
     if response_code not in RESPONSE_CODES:
-        log_message = \
-            f'\tФункция:\n\t{check_server_message.__name__}\n' \
-            f'\tАргумент:\n\t{response_message}\n' \
-            f'\tКод ответа:\n\t{response_code}\n' \
-            f'\tОшибка:\n\t{ResponseCodeError}'
-        client_logger.error(log_message)
         raise ResponseCodeError(response_code)
-    log_message = \
-        f'\tФункция:\n\t{check_server_message.__name__}\n' \
-        f'\tАргумент:\n\t{response_message}\n' \
-        f'\tОтвет:\n\t{response_message}'
-    client_logger.info(log_message)
     return response_message
 
 
@@ -109,6 +71,7 @@ if __name__ == '__main__':
                             f'\tОшибка:\n'
                             f'\tПереданы некорректные аргументы - {sys.argv[1]}, {sys.argv[2]}')
         sys.exit(0)
+
     client.connect((addr, port))
     presence = create_presence_message('Вася')
     send_message(client, presence)
