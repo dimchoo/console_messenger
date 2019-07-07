@@ -5,10 +5,13 @@ from jim.config import *
 from jim.utils import send_message, get_message
 import logging
 import log.log_configs.server_log_config
+from log.decorators import Log
 
 server_logger = logging.getLogger('server_logger')
+log_it = Log(server_logger)
 
 
+@log_it
 def presence_message_response(presence_message):
     """
     Функция формирует ответ на сообщение о присутствии от клиента
@@ -20,20 +23,8 @@ def presence_message_response(presence_message):
             and presence_message[ACTION] == PRESENCE \
             and TIME in presence_message \
             and re.match(time_template, presence_message[TIME]) is not None:
-        response_ok = {RESPONSE: OK}
-        log_message = \
-            f'\tФункция:\n\t{presence_message_response.__name__}\n' \
-            f'\tАргумент:\n\t{presence_message}\n' \
-            f'\tОтвет:\n\t{response_ok}'
-        server_logger.info(log_message)
-        return response_ok
-    response_error = {RESPONSE: WRONG_REQUEST, ERROR: 'Неверный запрос!'}
-    log_message = \
-        f'\tФункция:\n\t{presence_message_response.__name__}\n' \
-        f'\tАргумент:\n\t{presence_message}\n' \
-        f'\tОтвет:\n\t{response_error}'
-    server_logger.error(log_message)
-    return response_error
+        return {RESPONSE: OK}
+    return {RESPONSE: WRONG_REQUEST, ERROR: 'Неверный запрос!'}
 
 
 if __name__ == '__main__':
