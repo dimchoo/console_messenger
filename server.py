@@ -6,6 +6,7 @@ from jim.utils import send_message, get_message
 import logging
 import log.log_configs.server_log_config
 from log.decorators import Log
+import select
 
 server_logger = logging.getLogger('server_logger')
 log_it = Log(server_logger)
@@ -27,6 +28,45 @@ def presence_message_response(presence_message):
     return {RESPONSE: WRONG_REQUEST, ERROR: 'Неверный запрос!'}
 
 
+def read_requests(read_clients_list, all_clients_list):
+    """
+    Функция читает сообщения от клиентов и возвращает список с собщениями
+    :param read_clients_list: list (Сокеты клиентов, которые прислали сообщения для чтения)
+    :param all_clients_list: list (Все сокеты клиентов)
+    :return: list (Список с собщениями)
+    """
+    message_list = []
+
+    for client_socket in read_clients_list:
+        try:
+            client_message = get_message(client_socket)
+            message_list.append(client_message)
+        except Exception:
+            print('Клиент отключился!')
+            all_clients_list.remove(client_socket)
+        return message_list
+
+
+def send_responses(message_list, write_client_list, all_clients_list):
+    """
+    Функция отправки сообщений клиентам, ждущим сообщения
+    :param message_list: list (Список сообщений от клиентов, результат функции read_requests)
+    :param write_client_list: list (Сокеты клиентов, которые ждут сообщения)
+    :param all_clients_list: list (Все сокеты клиентов)
+    :return: None
+    """
+    for client_socket in write_client_list:
+        try:
+            for message in message_list:
+                try:
+                    send_message(client_socket, message)
+                except Exception:
+                    print('Клиент отключился!')
+                    all_clients_list.remove(client_socket)
+        except Exception:
+            pass
+
+
 if __name__ == '__main__':
     server = socket(AF_INET, SOCK_STREAM)
     try:
@@ -46,14 +86,31 @@ if __name__ == '__main__':
 
     server.bind((addr, port))
     server.listen(5)
+    server.settimeout(1)
+    clients_list = []
     try:
         while True:
-            client, addr = server.accept()
-            presence = get_message(client)
-            print(presence)
-            response = presence_message_response(presence)
-            send_message(client, response)
-            client.close()
+            try:
+                connection, addr = server.accept()
+                presence = get_message(connection)
+                response = presence_message_response(presence)
+                send_message(connection, response)
+            except OSError:
+                pass
+            else:
+                print(f'Запрос на соединение от {addr}')
+                clients_list.append(connection)
+            finally:
+                read_list = []
+                write_list = []
+
+            try:
+                read_list, write_list, error_list = select.select(clients_list, clients_list, [], 0)
+            except Exception:
+                pass
+
+            requests = read_requests(read_list, clients_list)
+            send_responses(requests, write_list, clients_list)
     except KeyboardInterrupt:
         server_logger.info('\tСервер остановлен')
         print('Сервер остановлен!')
