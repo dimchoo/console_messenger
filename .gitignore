@@ -6,3 +6,4 @@
 /log/log_configs/__pycache__/
 *.cpython-37.pyc
 *.log
+*.log.2019-07-07
