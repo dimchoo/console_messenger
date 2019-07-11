@@ -55,28 +55,87 @@ def check_server_message(response_message):
     return response_message
 
 
+def read_messages(client_socket):
+    """
+    Функция чтения клиентом сообщения
+    :param client_socket: Клиентский сокет
+    :return: None
+    """
+    print('Я читаю сообщения.')
+    while True:
+        try:
+            message = get_message(client_socket)
+            print(message)
+            print(message[MESSAGE])
+        except Exception:
+            continue
+
+
+def create_message(message_to, message_text, message_from=DEFAULT_ACCOUNT_NAME):
+    """
+    Функция  создания сообщения
+    :param message_to: str (Кому сообщение)
+    :param message_text: str (Текст сообщения)
+    :param message_from: str (от кого сообщение)
+    :return: dict (Словарь с нужными ключами для отправки и текстом сообщения)
+    """
+    return {
+        ACTION: MSG,
+        TIME: get_time(),
+        TO: message_to,
+        FROM: message_from,
+        MESSAGE: message_text
+    }
+
+
+def write_messages(client_socket):
+    """
+    Функция написания клиентом сообщения
+    :param client_socket: Кому отправляем сообщение
+    :return: None
+    """
+    print('Я пишу сообщения.')
+    while True:
+        message_text = str(input(':» '))
+        message = create_message('all', message_text)
+        send_message(client_socket, message)
+
+
 if __name__ == '__main__':
     client = socket(AF_INET, SOCK_STREAM)
     try:
-        addr = sys.argv[1]
+        mode = sys.argv[1]
+    except IndexError:
+        mode = 'r'
+    try:
+        addr = sys.argv[2]
     except IndexError:
         addr = DEFAULT_SERVER_ADDRESS
     try:
-        port = int(sys.argv[2])
+        port = int(sys.argv[3])
     except IndexError:
         port = DEFAULT_SERVER_PORT
     except ValueError:
         client_logger.error(f'\tФункция:\n'
                             f'\tsys.argv\n'
                             f'\tОшибка:\n'
-                            f'\tПереданы некорректные аргументы - {sys.argv[1]}, {sys.argv[2]}')
+                            f'\tПереданы некорректные аргументы - {sys.argv[2]}, {sys.argv[3]}')
         sys.exit(0)
 
     client.connect((addr, port))
-    presence = create_presence_message('Вася')
+    presence = create_presence_message()
     send_message(client, presence)
     server_response = get_message(client)
     server_response = check_server_message(server_response)
-    print(server_response)
-    client.close()
+
+    try:
+        if server_response[RESPONSE] == OK:
+            if mode == 'r':
+                read_messages(client)
+            elif mode == 'w':
+                write_messages(client)
+            else:
+                raise Exception(f'Ошибка! Неизвестный флаг "{mode}".')
+    except KeyboardInterrupt:
+        print('Клиент отключился!')
 
