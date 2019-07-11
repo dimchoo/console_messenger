@@ -30,9 +30,9 @@ ACTION = 'action'
 # - Текст ошибки (str):
 ERROR = 'error'
 # - От кого собщение:
-# FROM = 'from'
+FROM = 'from'
 # - Текст сообщения:
-# MESSAGE = 'message'
+MESSAGE = 'message'
 # - Пароль пользователя:
 # PASSWORD = 'password'
 # - Код ответа (int). 3 цифры:
@@ -42,7 +42,7 @@ RESPONSE = 'response'
 # - Время запроса:
 TIME = 'time'
 # - Кому отправить сообщение:
-# TO = 'to'
+TO = 'to'
 # - Тип:
 # TYPE = 'type'
 # - Данные пользователя (dict):
