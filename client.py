@@ -7,6 +7,7 @@ from jim.utils import send_message, get_message
 import logging
 import log.log_configs.client_log_config
 from log.decorators import Log
+from multiprocessing import Process
 
 client_logger = logging.getLogger('client_logger')
 log_it = Log(client_logger)
@@ -55,18 +56,18 @@ def check_server_message(response_message):
     return response_message
 
 
-def read_messages(client_socket):
+def read_messages(client_socket, sender):
     """
     Функция чтения клиентом сообщения
     :param client_socket: Клиентский сокет
+    :param sender: Имя аккаунта пославшего сообщение
     :return: None
     """
-    print('Я читаю сообщения.')
     while True:
         try:
             message = get_message(client_socket)
-            print(message)
-            print(message[MESSAGE])
+            if message[FROM] != sender:
+                print(message[MESSAGE])
         except Exception:
             continue
 
@@ -88,31 +89,14 @@ def create_message(message_to, message_text, message_from=DEFAULT_ACCOUNT_NAME):
     }
 
 
-def write_messages(client_socket):
-    """
-    Функция написания клиентом сообщения
-    :param client_socket: Кому отправляем сообщение
-    :return: None
-    """
-    print('Я пишу сообщения.')
-    while True:
-        message_text = str(input(':» '))
-        message = create_message('all', message_text)
-        send_message(client_socket, message)
-
-
 if __name__ == '__main__':
     client = socket(AF_INET, SOCK_STREAM)
     try:
-        mode = sys.argv[1]
-    except IndexError:
-        mode = 'r'
-    try:
-        addr = sys.argv[2]
+        addr = sys.argv[1]
     except IndexError:
         addr = DEFAULT_SERVER_ADDRESS
     try:
-        port = int(sys.argv[3])
+        port = int(sys.argv[2])
     except IndexError:
         port = DEFAULT_SERVER_PORT
     except ValueError:
@@ -130,12 +114,20 @@ if __name__ == '__main__':
 
     try:
         if server_response[RESPONSE] == OK:
-            if mode == 'r':
-                read_messages(client)
-            elif mode == 'w':
-                write_messages(client)
-            else:
-                raise Exception(f'Ошибка! Неизвестный флаг "{mode}".')
+            name_from = input('Введите ваше имя: ')
+            name_to = input('Введите имя получателя: ')
+            read_process = Process(target=read_messages, args=(client, name_from))
+            # read_process.daemon = True
+            read_process.start()
+            # read_process.join()
+
+            while True:
+                text = input('» ')
+                if text == 'quit':
+                    print(f'{name_from} отключился!')
+                    read_process.kill()
+                    break
+                new_message = create_message(name_to, text, name_from)
+                send_message(client, new_message)
     except KeyboardInterrupt:
         print('Клиент отключился!')
-
