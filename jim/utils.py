@@ -1,5 +1,6 @@
 import json
 from jim.config import COMMON_ENCODING
+from errors import IncorrectDataReceivedError, NonDictInputError
 
 
 def write_bytes(dict_message):
@@ -12,7 +13,7 @@ def write_bytes(dict_message):
     if isinstance(dict_message, dict):
         byte_message = json.dumps(dict_message).encode(COMMON_ENCODING)
         return byte_message
-    raise TypeError
+    raise NonDictInputError
 
 
 def read_bytes(byte_message):
@@ -26,8 +27,8 @@ def read_bytes(byte_message):
         dict_message = json.loads(byte_message.decode(COMMON_ENCODING))
         if isinstance(dict_message, dict):
             return dict_message
-        raise TypeError
-    raise TypeError
+        raise IncorrectDataReceivedError
+    raise IncorrectDataReceivedError
 
 
 def send_message(sock, message):
