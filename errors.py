@@ -87,3 +87,49 @@ class MissingKeyError(Exception):
         :return: str (Сообщение об ошибке)
         """
         return f'Отсутствует обязательный атрибут "{self.key}"'
+
+
+class IncorrectDataReceivedError(Exception):
+
+    """
+    Исключение.
+    Некорректное сообщение от удалённого компьютера
+    """
+    def __str__(self):
+        """
+        Строковое представление класса
+        :return: str (Сообщение об ошибке)
+        """
+        return 'Принято некорректное сообщение от удалённого компьютера!'
+
+
+class ServerError(Exception):
+
+    """
+    Исключение.
+    Ошибка сервера
+    """
+    def __init__(self, text):
+        """
+        Конструктор класса
+        :param text:
+        """
+        self.text = text
+
+    def __str__(self):
+        return self.text
+
+
+class NonDictInputError(Exception):
+
+    def __str__(self):
+        return 'Аргумент функции должен не словарь!'
+
+
+class ReqFieldMissingError(Exception):
+
+    def __init__(self, missing_field):
+        self.missing_field = missing_field
+
+    def __str__(self):
+        return f'В принятом словаре отсутствует обязательное поле {self.missing_field}.'
